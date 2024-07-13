@@ -17,10 +17,7 @@ fun Application.configureRouting() {
 
     routing {
         get("/posts") {
-            val env = System.getenv("DB_USER_NAME")
-            println(env)
             val posts = getPostsUsecase.handle()
-            println(posts)
 
             call.respond(status = HttpStatusCode.OK, posts)
         }
