@@ -1,6 +1,5 @@
 package owlstilttherheads.com.infrastructure.post
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.serialization.json.Json
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.Jdbi
@@ -11,8 +10,6 @@ import owlstilttherheads.com.usecase.post.PostRepository
 import java.sql.ResultSet
 import java.time.OffsetDateTime
 import java.util.*
-
-private val objectMapper: ObjectMapper = ObjectMapper()
 
 class PostRepositoryImpl(
     private val jdbi: Jdbi = Database.jdbi,
