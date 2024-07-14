@@ -4,23 +4,22 @@ import org.jdbi.v3.core.Jdbi
 import owlstilttherheads.com.domain.post.Post
 import owlstilttherheads.com.infrastructure.Database
 
-class UpdatePostInteractor(
+class CreatePostInteractor(
     private val postRepository: PostRepository,
     private val jdbi: Jdbi = Database.jdbi
-) : UpdatePostUsecase {
-    override fun handle(updatePost: UpdatePostDto) {
-        val updatedPost = Post.create(
-            id = updatePost.id,
-            content = updatePost.content,
-            isOpen = updatePost.isOpen
+) : CreatePostUsecase {
+    override fun handle(createPost: CreatePostDto) {
+        val createdPost = Post.create(
+            content = createPost.content,
+            isOpen = createPost.isOpen
         )
 
         jdbi.useHandle<Exception> { handle ->
             try {
-                postRepository.update(handle, updatedPost)
+                postRepository.create(handle, createdPost)
             } catch (e: Exception) {
                 handle.rollback()
-                throw Exception("error updating post $updatedPost", e)
+                throw Exception("error creating post $createdPost", e)
             }
         }
     }

@@ -14,16 +14,16 @@ data class Post(
 ) {
     companion object {
         fun create(
-            id: UUID?,
+            id: UUID = UUID.randomUUID(),
             content: JsonElement,
-            isOpen: Boolean?,
+            isOpen: Boolean = false,
         ): Post {
             return Post(
-                id = id ?: UUID.randomUUID(),
+                id = id,
                 createdAt = OffsetDateTime.now(),
                 updatedAt = OffsetDateTime.now(),
                 content = content,
-                isOpen = isOpen ?: false,
+                isOpen = isOpen,
                 order = 0,
             )
         }

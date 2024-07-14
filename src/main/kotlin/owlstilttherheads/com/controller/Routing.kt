@@ -10,11 +10,7 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import org.koin.ktor.ext.inject
-import owlstilttherheads.com.usecase.post.GetPostWithIdUsecase
-import owlstilttherheads.com.usecase.post.GetPostsUsecase
-import owlstilttherheads.com.usecase.post.UpdatePostDto
-import owlstilttherheads.com.usecase.post.UpdatePostUsecase
-import owlstilttherheads.com.utils.serializer.UuidSerializer
+import owlstilttherheads.com.usecase.post.*
 import java.util.*
 
 fun Application.configureRouting() {
@@ -24,6 +20,7 @@ fun Application.configureRouting() {
     val getPostsUsecase by inject<GetPostsUsecase>()
     val getPostWithIdUsecase by inject<GetPostWithIdUsecase>()
     val updatePostsUsecase by inject<UpdatePostUsecase>()
+    val createPostUsecase by inject<CreatePostUsecase>()
 
     routing {
         get("/posts") {
@@ -44,22 +41,44 @@ fun Application.configureRouting() {
         }
 
         patch("/post/{id}") {
-            val request = call.receive<Request>()
-            println(request)
-            updatePostsUsecase.handle(request.toDto())
+            val id = call.parameters["id"] ?: return@patch call.respond(
+                status = HttpStatusCode.BadRequest,
+                "id not specified."
+            )
+            val request = call.receive<UpdateRequest>()
+            updatePostsUsecase.handle(request.toDto(UUID.fromString(id)))
+            call.respond(HttpStatusCode.OK)
+        }
+
+        post("/post") {
+            val request = call.receive<CreateRequest>()
+            createPostUsecase.handle(request.toDto())
+            call.respond(HttpStatusCode.Created)
         }
     }
 }
 
 @Serializable
-data class Request(
-    @Serializable(with = UuidSerializer::class) val id: UUID,
+data class UpdateRequest(
     val content: JsonElement,
     val isOpen: Boolean
 ) {
-    fun toDto(): UpdatePostDto {
+    fun toDto(id: UUID): UpdatePostDto {
         return UpdatePostDto(
             id = id,
+            content = content,
+            isOpen = isOpen
+        )
+    }
+}
+
+@Serializable
+data class CreateRequest(
+    val content: JsonElement,
+    val isOpen: Boolean
+) {
+    fun toDto(): CreatePostDto {
+        return CreatePostDto(
             content = content,
             isOpen = isOpen
         )

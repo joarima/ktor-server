@@ -10,4 +10,5 @@ val appModules = module {
     single { GetPostsInteractor(get()) as GetPostsUsecase }
     single { GetPostWithIdInteractor(get()) as GetPostWithIdUsecase }
     single { UpdatePostInteractor(get()) as UpdatePostUsecase }
+    single { CreatePostInteractor(get()) as CreatePostUsecase }
 }

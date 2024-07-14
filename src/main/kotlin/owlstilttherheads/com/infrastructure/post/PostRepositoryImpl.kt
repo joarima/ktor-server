@@ -94,6 +94,28 @@ class PostRepositoryImpl(
         handle.commit()
     }
 
+    override fun create(handle: Handle, post: Post) {
+        val query = """
+            INSERT INTO post (
+                id,
+                content,
+                is_open
+            ) VALUES (
+                :id,
+                CAST(:content AS JSONB),
+                :isOpen
+            )
+        """.trimIndent()
+
+        handle.createUpdate(query)
+            .bind("id", post.id)
+            .bind("content", post.content.toString())
+            .bind("isOpen", post.isOpen)
+            .execute()
+
+        handle.commit()
+    }
+
     private fun postRowMapper(rs: ResultSet, ctx: StatementContext): Post {
         val id = rs.getString("id")
         val createdAt = rs.getObject("created_at", OffsetDateTime::class.java)
