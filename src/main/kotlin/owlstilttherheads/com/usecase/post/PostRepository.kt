@@ -9,4 +9,5 @@ interface PostRepository {
     fun findById(id: UUID): Post?
     fun update(handle: Handle, post: Post)
     fun create(handle: Handle, post: Post)
+    fun delete(handle: Handle, id: UUID)
 }

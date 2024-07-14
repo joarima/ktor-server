@@ -116,6 +116,20 @@ class PostRepositoryImpl(
         handle.commit()
     }
 
+    override fun delete(handle: Handle, id: UUID) {
+        val query = """
+            DELETE
+            FROM post
+            WHERE id = :id
+        """.trimIndent()
+
+        handle.createUpdate(query)
+            .bind("id", id)
+            .execute()
+
+        handle.commit()
+    }
+
     private fun postRowMapper(rs: ResultSet, ctx: StatementContext): Post {
         val id = rs.getString("id")
         val createdAt = rs.getObject("created_at", OffsetDateTime::class.java)

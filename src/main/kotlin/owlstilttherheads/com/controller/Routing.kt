@@ -21,6 +21,7 @@ fun Application.configureRouting() {
     val getPostWithIdUsecase by inject<GetPostWithIdUsecase>()
     val updatePostsUsecase by inject<UpdatePostUsecase>()
     val createPostUsecase by inject<CreatePostUsecase>()
+    val deletePostUsecase by inject<DeletePostUsecase>()
 
     routing {
         get("/posts") {
@@ -54,6 +55,15 @@ fun Application.configureRouting() {
             val request = call.receive<CreateRequest>()
             createPostUsecase.handle(request.toDto())
             call.respond(HttpStatusCode.Created)
+        }
+
+        delete("/post/{id}") {
+            val id = call.parameters["id"] ?: return@delete call.respond(
+                status = HttpStatusCode.BadRequest,
+                "id not specified."
+            )
+            deletePostUsecase.handle(UUID.fromString(id))
+            call.respond(HttpStatusCode.OK)
         }
     }
 }
