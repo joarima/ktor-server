@@ -7,6 +7,7 @@ import java.util.*
 interface PostRepository {
     fun findAll(): List<Post>
     fun findById(id: UUID): Post?
+    fun search(keywords: String): List<Post>
     fun update(handle: Handle, post: Post)
     fun create(handle: Handle, post: Post)
     fun delete(handle: Handle, id: UUID)

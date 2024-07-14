@@ -9,6 +9,7 @@ val appModules = module {
     single<PostRepository> { PostRepositoryImpl() }
     single { GetPostsInteractor(get()) as GetPostsUsecase }
     single { GetPostWithIdInteractor(get()) as GetPostWithIdUsecase }
+    single { SearchPostInteractor(get()) as SearchPostUsecase }
     single { UpdatePostInteractor(get()) as UpdatePostUsecase }
     single { CreatePostInteractor(get()) as CreatePostUsecase }
     single { DeletePostInteractor(get()) as DeletePostUsecase }

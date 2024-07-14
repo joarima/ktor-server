@@ -19,14 +19,19 @@ fun Application.configureRouting() {
     }
     val getPostsUsecase by inject<GetPostsUsecase>()
     val getPostWithIdUsecase by inject<GetPostWithIdUsecase>()
+    val searchPostUsecase by inject<SearchPostUsecase>()
     val updatePostsUsecase by inject<UpdatePostUsecase>()
     val createPostUsecase by inject<CreatePostUsecase>()
     val deletePostUsecase by inject<DeletePostUsecase>()
 
     routing {
         get("/posts") {
-            val posts = getPostsUsecase.handle()
-
+            val keywords = call.request.queryParameters["q"]
+            val posts = if (keywords.isNullOrEmpty()) {
+                getPostsUsecase.handle()
+            } else {
+                searchPostUsecase.handle(keywords)
+            }
             call.respond(HttpStatusCode.OK, posts)
         }
 

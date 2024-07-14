@@ -75,6 +75,37 @@ class PostRepositoryImpl(
         }
     }
 
+    override fun search(keywords: String): List<Post> {
+        val query = """
+            SELECT 
+                id, 
+                created_at, 
+                updated_at, 
+                content::varchar as content_j, 
+                is_open, 
+                "order"
+            FROM post
+            WHERE content &@~ :keywords
+            ORDER BY post.order DESC;
+        """.trimIndent()
+
+        return jdbi.withHandle<List<Post>, Exception> { handle ->
+            try {
+                val result = handle.createQuery(query)
+                    .bind("keywords", keywords)
+                    .map { rs, ctx -> postRowMapper(rs, ctx) }
+                    .list()
+
+                // See: https://stackoverflow.com/questions/38579231/hikaricp-select-queries-execute-roll-back-due-to-dirty-commit-state-on-close
+                handle.commit()
+                return@withHandle result
+            } catch (e: Exception) {
+                handle.rollback()
+                throw e
+            }
+        }
+    }
+
     override fun update(handle: Handle, post: Post) {
         val query = """
                 UPDATE post 
