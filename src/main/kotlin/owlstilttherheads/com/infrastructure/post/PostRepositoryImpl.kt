@@ -15,8 +15,7 @@ private val objectMapper: ObjectMapper = ObjectMapper()
 
 class PostRepositoryImpl(
     private val jdbi: Jdbi = Database.jdbi,
-
-    ) : PostRepository {
+) : PostRepository {
     override fun findAll(): List<Post> {
         return jdbi.withHandle<List<Post>, Exception> { handle ->
             val query = """
@@ -37,6 +36,35 @@ class PostRepositoryImpl(
                     .list()
 
                 // See: https://stackoverflow.com/questions/38579231/hikaricp-select-queries-execute-roll-back-due-to-dirty-commit-state-on-close
+                handle.commit()
+                return@withHandle result
+            } catch (e: Exception) {
+                handle.rollback()
+                throw e
+            }
+        }
+    }
+
+    override fun findById(id: UUID): Post? {
+        return jdbi.withHandle<Post, Exception> { handle ->
+            val query = """
+                SELECT 
+                    id, 
+                    created_at, 
+                    updated_at, 
+                    content::varchar as content_j, 
+                    is_open, 
+                    "order" 
+                FROM post
+                WHERE id = :id
+            """.trimIndent()
+
+            try {
+                val result = handle.createQuery(query)
+                    .bind("id", id)
+                    .map { rs, ctx -> postRowMapper(rs, ctx) }
+                    .singleOrNull()
+
                 handle.commit()
                 return@withHandle result
             } catch (e: Exception) {

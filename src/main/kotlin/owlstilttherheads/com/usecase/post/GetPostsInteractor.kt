@@ -1,13 +1,13 @@
 package owlstilttherheads.com.usecase.post
 
-class GetPostInteractor(
+class GetPostsInteractor(
     private val postRepository: PostRepository
 ) : GetPostsUsecase {
-    override fun handle(): List<Post> {
+    override fun handle(): List<PostDto> {
         val posts = postRepository.findAll()
 
         return posts.map {
-            Post(
+            PostDto(
                 id = it.id,
                 createdAt = it.createdAt,
                 updatedAt = it.updatedAt,
