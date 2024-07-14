@@ -2,6 +2,7 @@ package owlstilttherheads.com.infrastructure.post
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.serialization.json.Json
+import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.statement.StatementContext
 import owlstilttherheads.com.domain.post.Post
@@ -74,6 +75,25 @@ class PostRepositoryImpl(
         }
     }
 
+    override fun update(handle: Handle, post: Post) {
+        val query = """
+                UPDATE post 
+                    set updated_at = :updated_at, 
+                    content = CAST(:content AS JSONB), 
+                    is_open = :isOpen
+                WHERE id = :id
+            """.trimIndent()
+
+        handle.createUpdate(query)
+            .bind("id", post.id)
+            .bind("updated_at", post.updatedAt)
+            .bind("content", post.content.toString())
+            .bind("isOpen", post.isOpen)
+            .execute()
+
+        handle.commit()
+    }
+
     private fun postRowMapper(rs: ResultSet, ctx: StatementContext): Post {
         val id = rs.getString("id")
         val createdAt = rs.getObject("created_at", OffsetDateTime::class.java)
@@ -82,7 +102,7 @@ class PostRepositoryImpl(
         val isOpen = rs.getBoolean("is_open")
         val order = rs.getInt("order")
 
-        return Post(
+        return Post.restore(
             id = UUID.fromString(id),
             createdAt = createdAt,
             updatedAt = updatedAt,
