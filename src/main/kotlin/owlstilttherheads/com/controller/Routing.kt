@@ -4,6 +4,7 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.openapi.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -25,6 +26,7 @@ fun Application.configureRouting() {
     val deletePostUsecase by inject<DeletePostUsecase>()
 
     routing {
+        openAPI(path = "openapi", swaggerFile = "openapi/documentation.yaml")
         get("/posts") {
             val keywords = call.request.queryParameters["q"]
             val posts = if (keywords.isNullOrEmpty()) {

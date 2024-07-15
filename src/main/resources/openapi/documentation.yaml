@@ -1,0 +1,175 @@
+openapi: "3.1.0"
+info:
+  title: "com_owlstilttherheads_owls_server API"
+  description: "com_owlstilttherheads_owls_server API"
+  version: "1.0.0"
+servers:
+  - url: "https://com_owlstilttherheads_owls_server"
+paths:
+  /post:
+    post:
+      description: ""
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRequest"
+        required: true
+      responses:
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /post/{id}:
+    delete:
+      description: ""
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "id not specified."
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+    get:
+      description: ""
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "id not specified."
+        "404":
+          description: "Not Found"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: ""
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PostDto"
+    patch:
+      description: ""
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRequest"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "id not specified."
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /posts:
+    get:
+      description: ""
+      parameters:
+        - name: "q"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "uuid"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/PostDto"
+components:
+  schemas:
+    JsonElement:
+      type: "object"
+      properties: { }
+    CreateRequest:
+      type: "object"
+      properties:
+        content:
+          $ref: "#/components/schemas/JsonElement"
+      required:
+        - "content"
+    PostDto:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+        createdAt:
+          type: "string"
+          format: "date-time"
+        updatedAt:
+          type: "string"
+          format: "date-time"
+        content:
+          $ref: "#/components/schemas/JsonElement"
+        order:
+          type: "integer"
+          format: "int32"
+      required:
+        - "id"
+        - "createdAt"
+        - "updatedAt"
+        - "content"
+    UpdateRequest:
+      type: "object"
+      properties:
+        content:
+          $ref: "#/components/schemas/JsonElement"
+      required:
+        - "content"

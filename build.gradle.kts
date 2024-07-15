@@ -29,6 +29,8 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation:2.3.12")
     implementation("io.ktor:ktor-serialization-jackson:2.3.12")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
+    implementation("io.ktor:ktor-server-openapi:$ktor_version")
+    implementation("io.swagger.codegen.v3:swagger-codegen-generators:1.0.50")
     implementation("org.jdbi:jdbi3-core:3.45.2")
     implementation("org.jdbi:jdbi3-kotlin:3.45.2")
     implementation("org.jdbi:jdbi3-jackson2:3.45.2")
