@@ -4,6 +4,7 @@ import kotlinx.serialization.json.Json
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.statement.StatementContext
+import owlstilttherheads.com.domain.exception.InfrastructureException
 import owlstilttherheads.com.domain.post.Post
 import owlstilttherheads.com.infrastructure.Database
 import owlstilttherheads.com.usecase.post.PostRepository
@@ -38,7 +39,7 @@ class PostRepositoryImpl(
                 return@withHandle result
             } catch (e: Exception) {
                 handle.rollback()
-                throw e
+                throw InfrastructureException("error loading all post", e)
             }
         }
     }
@@ -67,7 +68,7 @@ class PostRepositoryImpl(
                 return@withHandle result
             } catch (e: Exception) {
                 handle.rollback()
-                throw e
+                throw InfrastructureException("error finding post with id: $id", e)
             }
         }
     }
@@ -98,7 +99,7 @@ class PostRepositoryImpl(
                 return@withHandle result
             } catch (e: Exception) {
                 handle.rollback()
-                throw e
+                throw InfrastructureException("error searching post with keywords: $keywords", e)
             }
         }
     }
@@ -112,14 +113,19 @@ class PostRepositoryImpl(
                 WHERE id = :id
             """.trimIndent()
 
-        handle.createUpdate(query)
-            .bind("id", post.id)
-            .bind("updated_at", post.updatedAt)
-            .bind("content", post.content.toString())
-            .bind("isOpen", post.isOpen)
-            .execute()
+        try {
+            handle.createUpdate(query)
+                .bind("id", post.id)
+                .bind("updated_at", post.updatedAt)
+                .bind("content", post.content.toString())
+                .bind("isOpen", post.isOpen)
+                .execute()
 
-        handle.commit()
+            handle.commit()
+        } catch (e: Exception) {
+            handle.rollback()
+            throw InfrastructureException("error updating post $post", e)
+        }
     }
 
     override fun create(handle: Handle, post: Post) {
@@ -135,13 +141,18 @@ class PostRepositoryImpl(
             )
         """.trimIndent()
 
-        handle.createUpdate(query)
-            .bind("id", post.id)
-            .bind("content", post.content.toString())
-            .bind("isOpen", post.isOpen)
-            .execute()
+        try {
+            handle.createUpdate(query)
+                .bind("id", post.id)
+                .bind("content", post.content.toString())
+                .bind("isOpen", post.isOpen)
+                .execute()
 
-        handle.commit()
+            handle.commit()
+        } catch (e: Exception) {
+            handle.rollback()
+            throw InfrastructureException("error creating post $post", e)
+        }
     }
 
     override fun delete(handle: Handle, id: UUID) {
@@ -151,11 +162,16 @@ class PostRepositoryImpl(
             WHERE id = :id
         """.trimIndent()
 
-        handle.createUpdate(query)
-            .bind("id", id)
-            .execute()
+        try {
+            handle.createUpdate(query)
+                .bind("id", id)
+                .execute()
 
-        handle.commit()
+            handle.commit()
+        } catch (e: Exception) {
+            handle.rollback()
+            throw InfrastructureException("error deleting post id: $id", e)
+        }
     }
 
     private fun postRowMapper(rs: ResultSet, ctx: StatementContext): Post {

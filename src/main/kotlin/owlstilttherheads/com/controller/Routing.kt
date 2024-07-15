@@ -11,6 +11,7 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import org.koin.ktor.ext.inject
+import owlstilttherheads.com.domain.exception.BadRequestException
 import owlstilttherheads.com.usecase.post.*
 import java.util.*
 
@@ -38,21 +39,15 @@ fun Application.configureRouting() {
         }
 
         get("/post/{id}") {
-            val id = call.parameters["id"] ?: return@get call.respond(
-                status = HttpStatusCode.BadRequest,
-                "id not specified."
-            )
+            val id = call.parameters["id"] ?: throw BadRequestException("id not specified.")
             val post =
                 getPostWithIdUsecase.handle(UUID.fromString(id))
-                    ?: return@get call.respond(status = HttpStatusCode.NotFound, "post with id $id not found.")
+                    ?: throw BadRequestException("post with id $id not found.")
             call.respond(HttpStatusCode.OK, post)
         }
 
         patch("/post/{id}") {
-            val id = call.parameters["id"] ?: return@patch call.respond(
-                status = HttpStatusCode.BadRequest,
-                "id not specified."
-            )
+            val id = call.parameters["id"] ?: throw BadRequestException("id not specified.")
             val request = call.receive<UpdateRequest>()
             updatePostsUsecase.handle(request.toDto(UUID.fromString(id)))
             call.respond(HttpStatusCode.OK)
@@ -65,10 +60,7 @@ fun Application.configureRouting() {
         }
 
         delete("/post/{id}") {
-            val id = call.parameters["id"] ?: return@delete call.respond(
-                status = HttpStatusCode.BadRequest,
-                "id not specified."
-            )
+            val id = call.parameters["id"] ?: throw BadRequestException("id not specified.")
             deletePostUsecase.handle(UUID.fromString(id))
             call.respond(HttpStatusCode.OK)
         }

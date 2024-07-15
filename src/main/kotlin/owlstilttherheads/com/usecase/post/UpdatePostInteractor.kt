@@ -16,12 +16,7 @@ class UpdatePostInteractor(
         )
 
         jdbi.useHandle<Exception> { handle ->
-            try {
-                postRepository.update(handle, updatedPost)
-            } catch (e: Exception) {
-                handle.rollback()
-                throw Exception("error updating post $updatedPost", e)
-            }
+            postRepository.update(handle, updatedPost)
         }
     }
 }
