@@ -42,6 +42,7 @@ dependencies {
     implementation("io.insert-koin:koin-ktor:3.5.6")
     implementation("io.insert-koin:koin-logger-slf4j:3.5.6")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.2")
+    implementation("io.exoquery:pprint-kotlin:2.0.2")
 
     // test dependencies
     testImplementation("io.ktor:ktor-server-tests-jvm")
